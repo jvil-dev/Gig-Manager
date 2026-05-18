@@ -7,6 +7,8 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: false
+firebase:
+  service-account-path: firebase-service-account.json
 
 server:
   port: 8080
