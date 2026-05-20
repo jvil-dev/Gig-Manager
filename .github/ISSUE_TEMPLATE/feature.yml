@@ -1,0 +1,37 @@
+name: Feature
+description: Build a new feature, enhancement, or piece of functionality
+title: "feat: <imperative summary>"
+labels: ["type:feat"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for any "build something" work. After creating the issue, relabel as `type:chore` or `type:refactor` if it turns out to be maintenance or restructuring rather than a new feature.
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: What problem does this solve? What does it enable?
+      placeholder: 1-2 sentences on the motivation
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Testable, observable conditions for "done". Use a task list.
+      value: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+
+  - type: textarea
+    id: out_of_scope
+    attributes:
+      label: Out of Scope
+      description: Anything an over-eager reading might lump in but shouldn't be done here.
+    validations:
+      required: false
