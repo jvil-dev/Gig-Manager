@@ -1,0 +1,63 @@
+name: Refactor
+description: Restructure code without changing behavior
+title: "refactor: <imperative summary>"
+labels: ["type:refactor"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Refactor = no behavior change.** If user-visible behavior or
+        API contracts change, this is a `feat` or `fix` issue, not a refactor.
+
+  - type: textarea
+    id: current_state
+    attributes:
+      label: Current state
+      description: What does the code look like now, and what's painful about it?
+    validations:
+      required: true
+
+  - type: textarea
+    id: desired_state
+    attributes:
+      label: Desired state
+      description: What should it look like after?
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: What future work does this unlock or simplify?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: behavior_change
+    attributes:
+      label: Behavior change
+      description: Confirm no user-visible behavior or API contract changes.
+      options:
+        - None — pure refactor
+        - Some — re-scope as feat or fix
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: How will we verify behavior is unchanged? (e.g. existing tests pass)
+      value: |
+        - [ ] All existing tests still pass without modification
+        - [ ]
+    validations:
+      required: true
+
+  - type: textarea
+    id: out_of_scope
+    attributes:
+      label: Out of Scope
+    validations:
+      required: false

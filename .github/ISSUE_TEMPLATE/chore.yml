@@ -1,0 +1,28 @@
+name: Chore
+description: Maintenance, tooling, config, or other non-functional work
+title: "chore: <imperative summary>"
+labels: ["type:chore"]
+body:
+  - type: textarea
+    id: what_and_why
+    attributes:
+      label: What & Why
+      description: What needs doing, and why now.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      value: |
+        - [ ]
+    validations:
+      required: true
+
+  - type: textarea
+    id: out_of_scope
+    attributes:
+      label: Out of Scope
+    validations:
+      required: false
