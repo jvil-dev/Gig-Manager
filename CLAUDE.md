@@ -8,23 +8,22 @@ Portfolio app for a working DJ/violinist to manage gigs, clients, income, setlis
 
 ## Tech Stack
 
-| Layer             | Choice                                                                              |
-| ----------------- | ----------------------------------------------------------------------------------- |
-| Backend           | Java / Spring Boot                                                                  |
-| Database          | PostgreSQL (local dev) → Google Cloud SQL (prod)                                    |
-| iOS               | SwiftUI + Firebase Auth (Apple, Google, Email+Password)                             |
-| Auth verification | Firebase Admin SDK (server-side)                                                    |
-| Deploy            | Google Cloud Run (containerized)                                                    |
-| Payments          | Stripe — Payment Links per gig; webhook flips `payment_status`                      |
-| AI                | Vertex AI / Gemini — `gemini-2.5-pro` (drafts), `gemini-2.5-flash` (parsing/vision) |
-| Weather           | Apple WeatherKit — iOS native only, no backend involvement                          |
+| Layer    | Choice                                                                              |
+| -------- | ----------------------------------------------------------------------------------- |
+| Backend  | Java / Spring Boot                                                                  |
+| Database | PostgreSQL (local dev) → Google Cloud SQL (prod)                                    |
+| iOS      | SwiftUI + Firebase Auth (Apple, Google, Email+Password)                             |
+| Deploy   | Google Cloud Run (containerized)                                                    |
+| Payments | Stripe — Payment Links per gig; webhook flips `payment_status`                      |
+| AI       | Vertex AI / Gemini — `gemini-2.5-pro` (drafts), `gemini-2.5-flash` (parsing/vision) |
+| Weather  | Apple WeatherKit — iOS native only, no backend involvement                          |
 
 ## Architecture
 
 - All REST routes live under `/api/v1/`.
-- `FirebaseAuthFilter` (`security/FirebaseAuthFilter.java`) intercepts every `/api/**` request: reads the `Authorization: Bearer <token>` header, verifies the token via Firebase Admin SDK, sets the UID as principal, and rejects with 401 if missing or invalid.
-- `SecurityConfig` (`config/SecurityConfig.java`): stateless, no CSRF, all `/api/**` requires auth, everything else is public. The Stripe webhook endpoint is excluded from the auth filter.
-- Every query must be scoped to the Firebase UID from the security context. User A must never see User B's data.
+- `JwtAuthFilter` (`security/JwtAuthFilter.java`) intercepts every `/api/**` request: reads the `Authorization: Bearer <token>` header, validates the JWT, sets the user UUID as principal, and rejects with 401 if missing or invalid.
+- `SecurityConfig` (`config/SecurityConfig.java`): stateless, no CSRF, all `/api/**` requires auth, auth endpoints (`/api/v1/auth/**`) are public. The Stripe webhook endpoint is excluded from the auth filter.
+- Every query must be scoped to the user UUID from the security context. User A must never see User B's data.
 - JPA `ddl-auto: validate` — Hibernate never creates or alters tables. All schema changes require a Flyway migration.
 - Finance data is derived via aggregate queries on the `gigs` table — there is no separate payments/income table. The Stripe webhook updates `gigs.payment_status` directly.
 - All AI calls are routed through Spring — never called directly from iOS.
@@ -33,8 +32,8 @@ Portfolio app for a working DJ/violinist to manage gigs, clients, income, setlis
 
 ```
 com.jvilledaapps.gig_manager/
-  config/       # FirebaseConfig, SecurityConfig
-  security/     # FirebaseAuthFilter
+  config/       # SecurityConfig
+  security/     # JwtAuthFilter
   controller/
   service/
   repository/
@@ -46,20 +45,19 @@ com.jvilledaapps.gig_manager/
 Backend (B1–B15):
 
 1. Project setup — done
-2. Firebase auth filter — done
-3. Flyway + schema migrations
-4. User profile endpoint
-5. Gig CRUD
-6. Client CRUD
-7. Setlist + song CRUD
-8. Gear inventory CRUD
-9. Gig checklist + templates
-10. Standalone to-dos
-11. Stripe — Payment Link generation + webhook
-12. Finance summary
-13. Vertex AI foundation
-14. AI draft-message endpoint
-15. AI parse-gig + analyze-gear endpoints
+2. Flyway + schema migrations
+3. User profile endpoint
+4. Gig CRUD
+5. Client CRUD
+6. Setlist + song CRUD
+7. Gear inventory CRUD
+8. Gig checklist + templates
+9. Standalone to-dos
+10. Stripe — Payment Link generation + webhook
+11. Finance summary
+12. Vertex AI foundation
+13. AI draft-message endpoint
+14. AI parse-gig + analyze-gear endpoints
 
 iOS (I1–I9):
 
@@ -109,7 +107,7 @@ Deploy (D1): Cloud Run + Cloud SQL + Stripe secrets + Vertex AI service account
 
 ## Safe-Change Rules
 
-- `FirebaseAuthFilter` and `SecurityConfig` are security-critical. Any change requires a manual re-test of the full auth flow.
+- `JwtAuthFilter` and `SecurityConfig` are security-critical. Any change requires a manual re-test of the full auth flow.
 - Never modify the schema without a corresponding Flyway migration. Never change `ddl-auto`.
 - The Stripe webhook endpoint must remain excluded from the auth filter.
 - All `/api/**` routes must require authentication — do not add public exceptions without explicit approval.
@@ -135,4 +133,4 @@ All commands run from the `backend/` directory.
 ./mvnw test -Dtest=ClassName#methodName
 ```
 
-**Prerequisites**: PostgreSQL at `localhost:5432` with a `gigmanager` database and `postgres/postgres` credentials. `firebase-service-account.json` must be present in `backend/` — gitignored, never commit it.
+**Prerequisites**: PostgreSQL at `localhost:5432` with a `gigmanager` database and `postgres/postgres` credentials.
