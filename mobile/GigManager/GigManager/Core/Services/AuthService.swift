@@ -12,7 +12,11 @@ import Foundation
 
 struct AuthService: Sendable {
     
-    private let base = NetworkClient.baseURL
+    private let base: String
+
+    nonisolated init() {
+        self.base = NetworkClient.baseURL
+    }
     
     func login(_ req: LoginRequest) async throws -> AuthResponse {
         guard let url = URL(string: base + "/api/v1/auth/login") else {

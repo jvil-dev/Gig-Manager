@@ -21,7 +21,7 @@ final class AuthViewModel: ObservableObject {
     
     private let service: AuthService
     
-    nonisolated init(service: AuthService = AuthService()) {
+    init(service: AuthService = AuthService()) {
         self.service = service
     }
     

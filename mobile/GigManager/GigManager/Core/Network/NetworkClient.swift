@@ -12,8 +12,8 @@ import Foundation
 
 enum NetworkClient {
     #if DEBUG
-    static let baseURL = "http://localhost:8080"
+    nonisolated static let baseURL = "http://localhost:8080"
     #else
-    static let baseURL = "https://api.gig-manager.com"
+    nonisolated static let baseURL = "https://api.gig-manager.com"
     #endif
 }
