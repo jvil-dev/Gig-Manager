@@ -13,10 +13,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Select XCode 26
+        run: sudo xcode-select -s /Applications/XCode_26.3.app/Contents/Developer
+
       - name: Build iOS app
         run: |
           xcodebuild build \
-            -workspace mobile/GigManager/GigManager.xcworkspace \
+            -project mobile/GigManager/GigManager.xcodeproj \
             -scheme GigManager \
-            -destination 'platform=iOS Simulatorm,name=iPhone 16' \
+            -destination 'generic/platform=iOS Simulator' \
             CODE_SIGNING_ALLOWED=NO
