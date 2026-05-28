@@ -1,0 +1,22 @@
+name: CI- iOS
+
+on:
+  pull_request:
+    branches: [development, main]
+    paths:
+      - "mobile/**"
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build iOS app
+        run: |
+          xcodebuild build \
+            -workspace mobile/GigManager/GigManager.xcworkspace \
+            -scheme GigManager \
+            -destination 'platform=iOS Simulatorm,name=iPhone 16' \
+            CODE_SIGNING_ALLOWED=NO
