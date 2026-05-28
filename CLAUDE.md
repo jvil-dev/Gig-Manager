@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Portfolio app for a working DJ/violinist to manage gigs, clients, income, setlists, and gear. Single-user for now; public release is the long-term goal. The backend is the active development target — the iOS client is not yet scaffolded.
+Portfolio app for a working DJ/violinist to manage gigs, clients, income, setlists, and gear. Single-user for now; public release is the long-term goal.
 
 ## Tech Stack
 
@@ -12,7 +12,7 @@ Portfolio app for a working DJ/violinist to manage gigs, clients, income, setlis
 | -------- | ----------------------------------------------------------------------------------- |
 | Backend  | Java / Spring Boot                                                                  |
 | Database | PostgreSQL (local dev) → Google Cloud SQL (prod)                                    |
-| iOS      | SwiftUI + Firebase Auth (Apple, Google, Email+Password)                             |
+| iOS      | SwiftUI + custom JWT auth (Apple, Google, Email+Password)                           |
 | Deploy   | Google Cloud Run (containerized)                                                    |
 | Payments | Stripe — Payment Links per gig; webhook flips `payment_status`                      |
 | AI       | Vertex AI / Gemini — `gemini-2.5-pro` (drafts), `gemini-2.5-flash` (parsing/vision) |
@@ -61,7 +61,7 @@ Backend (B1–B15):
 
 iOS (I1–I9):
 
-1. Xcode project + Firebase Auth
+1. Xcode project + custom JWT auth
 2. APIClient + models
 3. TabView + Profile tab
 4. Schedule tab (calendar + new gig + paste-from-message)
