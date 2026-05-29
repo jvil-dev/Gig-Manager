@@ -29,12 +29,29 @@ struct APIClient: Sendable {
     
     private let base = NetworkClient.baseURL
     
+    private static let localDateTimeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        return f
+    }()
+
     private func decoder() -> JSONDecoder {
         let d = JSONDecoder()
-        let f = DateFormatter()
-        f.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        f.locale = Locale(identifier: "en_US_POSIX")
-        d.dateDecodingStrategy = .formatted(f)
+        d.dateDecodingStrategy = .custom { decoder in
+            let raw = try decoder.singleValueContainer().decode(String.self)
+            let parts = raw.split(separator: ".", maxSplits: 1)
+            guard let date = APIClient.localDateTimeFormatter.date(from: String(parts[0])) else {
+                throw DecodingError.dataCorrupted(
+                    .init(codingPath: decoder.codingPath,
+                          debugDescription: "Date does not match expected format: \(raw)")
+                )
+            }
+            guard parts.count == 2, let fraction = Double("0.\(parts[1])") else {
+                return date
+            }
+            return date.addingTimeInterval(fraction)
+        }
         return d
     }
     
