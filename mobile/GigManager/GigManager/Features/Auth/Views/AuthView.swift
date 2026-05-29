@@ -27,49 +27,108 @@ struct AuthView: View {
     private var displayName: String = ""
     
     var body: some View {
-        VStack(spacing: 16) {
-            if mode == .register {
+        VStack(spacing: 32) {
+            branding
+            
+            VStack(spacing: 16) {
+                fields
+                errorMessage
+                primaryButton
+            }
+            
+            modeToggle
+        }
+        .padding(24)
+    }
+    
+    private var branding: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "music.note.list")
+                .font(.system(size: 56))
+                .foregroundStyle(.tint)
+            Text("Gig Manager")
+                .font(.largeTitle)
+                .bold()
+            Text("Manage your gigs, clients, and income")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+    }
+    
+    @ViewBuilder
+    private var fields: some View {
+        if mode == .register {
+            styledField {
                 TextField("Display Name", text: $displayName)
                     .textContentType(.name)
                     .textInputAutocapitalization(.words)
             }
-            
+        }
+
+        styledField {
             TextField("Email", text: $email)
-                .keyboardType(.emailAddress)
                 .textContentType(.emailAddress)
                 .textInputAutocapitalization(.never)
+                .keyboardType(.emailAddress)
                 .autocorrectionDisabled()
-            
+        }
+        
+        styledField {
             SecureField("Password", text: $password)
                 .textContentType(mode == .login ? .password : .newPassword)
-            
-            if let error = authVM.errorMessage {
-                Text(error)
-                    .foregroundStyle(.red)
-                    .font(.caption)
-            }
-            
-            if authVM.isLoading {
-                ProgressView()
-            } else {
-                Button(mode == .login ? "Sign In" : "Register") {
-                    Task {
-                        if mode == .login {
-                            await authVM.login(email: email, password: password)
-                        } else {
-                            await authVM.register(email: email, password: password, displayName: displayName)
-                        }
-                    }
+        }
+    }
+    
+    @ViewBuilder
+    private var errorMessage: some View {
+        if let error = authVM.errorMessage {
+            Text(error)
+                .font(.caption)
+                .foregroundStyle(.red)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+    
+    private var primaryButton: some View {
+        Button(action: submit) {
+            Group {
+                if authVM.isLoading {
+                    ProgressView()
+                } else {
+                    Text(mode == .login ? "Sign In" : "Create Account")
+                        .bold()
                 }
             }
-            
-            Button(mode == .login ? "No account? Register" : "Have an account? Sign in") {
-                mode = mode == .login ? .register : .login
-                displayName = ""
-                authVM.clearError()
-            }
-            .font(.caption)
+            .frame(maxWidth: .infinity, minHeight: 50)
         }
-        .padding()
+        .buttonStyle(.borderedProminent)
+        .disabled(authVM.isLoading)
+    }
+    
+    private var modeToggle: some View {
+        Button {
+            mode = mode == .login ? .register : .login
+            displayName = ""
+            authVM.clearError()
+        } label: {
+            Text(mode == .login ? "No account? Register" : "Have an account? Sign In")
+                .font(.subheadline)
+        }
+    }
+    
+    private func styledField<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+        content()
+            .padding()
+            .background(.quaternary, in: .rect(cornerRadius: 12))
+    }
+    
+    private func submit() {
+        Task {
+            if mode == .login {
+                await authVM.login(email: email, password: password)
+            } else {
+                await authVM.register(email: email, password: password, displayName: displayName)
+            }
+        }
     }
 }

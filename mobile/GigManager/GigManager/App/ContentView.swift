@@ -7,7 +7,7 @@
 
 // MARK: - Content View
 //
-// Root view. Routes between AuthView and app content
+// Root view. Routes between AuthView and main tab
 
 import SwiftUI
 
@@ -19,7 +19,7 @@ struct ContentView: View {
         if authVM.currentUser == nil {
             AuthView()
         } else {
-            SignedInView()
+            MainTabView()
         }
     }
 }
