@@ -11,6 +11,14 @@ enum PaymentStatus: String, Codable, CaseIterable, Sendable {
     case unpaid = "UNPAID"
     case depositPaid = "DEPOSIT_PAID"
     case paid = "PAID"
+    
+    var displayName: String {
+        switch self {
+        case .unpaid: return "Unpaid"
+        case .depositPaid: return "Deposit Paid"
+        case .paid: return "Paid"
+        }
+    }
 }
 
 struct GigResponse: Codable, Sendable, Identifiable {
