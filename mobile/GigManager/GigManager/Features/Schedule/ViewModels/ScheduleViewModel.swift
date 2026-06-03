@@ -85,4 +85,14 @@ final class ScheduleViewModel {
             $0.id == id
         }
     }
+    
+    func update(id: UUID, _ req: UpdateGigRequest, using authVM: AuthViewModel) async throws {
+        let token = try await authVM.validAccessToken()
+        let updated = try await service.update(id: id, req, token: token)
+        if let idx = gigs.firstIndex(where: {
+            $0.id == id
+        }) {
+            gigs[idx] = updated
+        }
+    }
 }

@@ -65,8 +65,13 @@ struct ScheduleView: View {
         List {
             ForEach(vm.groupedGigs, id: \.key) { group in
                 Section(group.key) {
-                    ForEach(group.value) { gig in
-                        GigRow(gig: gig)
+                    ForEach(group.value) {
+                        gig in
+                        NavigationLink {
+                            GigDetailView(gig: gig, viewModel: vm)
+                        } label: {
+                            GigRow(gig: gig)
+                        }
                     }
                     .onDelete { indexSet in
                         Task {
